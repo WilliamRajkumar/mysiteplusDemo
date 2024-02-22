@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="flex items-center justify-center min-h-screen bg-blue-500">
+    <div class="bg-white p-8 rounded shadow-md w-96 text-center">
+        <h2 class="text-3xl font-bold mb-8 text-blue-700">Barcode Generator System</h2>
+        <label for="username" class="block mb-2">Username:</label>
+        <input type="text" id="username" name="username" class="border rounded w-full p-2 mb-4" required>
+
+        <label for="password" class="block mb-2">Password:</label>
+        <input type="password" id="password" name="password" class="border rounded w-full p-2 mb-4" required>
+
+        <button onclick="login()" class="w-full bg-green-500 text-white rounded px-4 py-2">Login</button>
+    </div>
+
+    <script>
+        function login() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            // Check if the entered credentials are correct
+            if (username === 'admin' && password === 'admin12') {
+                // Set a session variable (in a real-world scenario, use a secure authentication mechanism)
+                sessionStorage.setItem('authenticated', 'true');
+                // Redirect to the product.html page
+                window.location.href = 'product.html';
+            } else {
+                alert('Invalid username or password');
+            }
+        }
+    </script>
+</body>
+
+</html>

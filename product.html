@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Barcode Generator</title>
+    <!-- Include Vue.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode.vue@3.4.1/dist/qrcode.vue.browser.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+
+
+</head>
+<style>
+    body{
+        margin-left: 50px;
+        padding: auto;
+    }
+</style>
+<body>
+    <div class="text-center">
+        <h1 class="mx-auto">Bar Code Generator</h1>
+    </div>
+    <br><br>
+    <div class="bg-right-bottom flex items-center justify-between">
+        <button class="bg-green-500 text-white rounded px-4 py-2 inline-flex items-center" onclick="redirectToCreatePage()">
+            <i class="material-icons">add</i>Add New Product
+        </button>
+        <button class="bg-red-500 text-white rounded px-4 py-2 inline-flex items-center" onclick="logout()">
+              Logout <i class="material-icons">exit_to_app</i>
+        </button>
+        <br><br>
+    </div>
+    
+<div style="width: 100%;" id="app">
+	<div style="width: 55%;display: inline-block;height: 800px;overflow: scroll;">
+        
+		<div>
+            <div class="flex items-center border border-gray-300 p-2 mb-4">
+                <label for="search" class="mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </label>
+                <input type="text" v-model="search" @input="handleSearch"
+                    class="outline-none focus:outline-none border-none w-full">
+            </div>
+            
+            
+                <table class="min-w-full border border-gray-300">
+                    <thead class="bg-gray-200">
+            <tr>
+            	
+                <th class="border p-2"></th>
+                    <th class="border p-2">ID</th>
+                    <th class="border p-2">Name</th>
+                    <th class="border p-2">Mrp</th>
+                    <th class="border p-2">Base Cost</th>
+                    <th class="border p-2">Tax</th>
+                    <th class="border p-2">Cost</th>
+                    <th class="border p-2">Selling Price</th>
+                    <th class="border p-2">UOM</th>
+                    <th class="border p-2">QR Code</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in itemsToDisplay" :key="item.id">
+            	 <td>
+            	 	<input type="radio" :value="item" v-model="selectedItem" @change="handleRadioChange">
+            	 	
+            	 </td>
+                 <td class="border p-2">{{ item.code }}</td>
+                 <td class="border p-2">{{ item.name }}</td>
+                 <td class="border p-2">{{ item.mrp }}</td>
+                 <td class="border p-2">{{ item.base_cost }}</td>
+                 <td class="border p-2">{{ item.tax }}</td>
+                 <td class="border p-2">{{ item.cost }}</td>
+                 <td class="border p-2">{{ item.sales_price }}</td>
+                 <td class="border p-2">{{ item.uom }}</td>
+                 <td class="border p-2">{{ item.product_base_qr }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+	</div>
+    <div class="w-35 inline-block align-top border p-4 mb-4">
+        <div v-if="selectedItem" class="p-4">
+            <h2 class="text-lg font-bold mb-2">Edit Item</h2>
+        
+            <input type="text" name="id" id="product_id" value="" readonly class="border rounded p-2 mb-2" hidden>
+            <div class="flex mb-2">
+                <div class="flex-1 mr-2">
+            <p>Name:</p>
+            <input type="text" name="name" id="product_name" value=" " class="border rounded p-2 mb-2">
+                </div>
+                <div class="flex-1 ml-2">
+            <p>MRP:</p>
+            <input type="text" name="mrp" id="mrp" value=" " class="border rounded p-2 mb-2">
+            </div></div>
+            <div class="flex mb-2">
+                <div class="flex-1 mr-2">
+            <p>Base Cost:</p>
+            <input type="text" name="base_cost" id="base_cost" value=" " class="border rounded p-2 mb-2">
+                </div>
+                <div class="flex-1 ml-2">
+            <p>TAX:</p>
+            <input type="text" name="tax" id="tax" value=" " class="border rounded p-2 mb-2">
+            </div></div>
+            <div class="flex mb-2">
+                <div class="flex-1 mr-2">
+            <p>Cost:</p>
+            <input type="text" name="cost" id="cost" value=" " class="border rounded p-2 mb-2">
+                </div>
+                <div class="flex-1 ml-2">
+            <p>Selling Price:</p>
+          
+            <input type="text" name="sales_price" id="sales_price" value=" " class="border rounded p-2 mb-2">
+        </div></div>
+        
+            <p>Product QR:</p>
+            <input type="text" name="product_base_qr" id="product_base_qr" value=" " class="border rounded p-2 mb-2">
+    
+            <p>UOM:</p>
+            <select id="uom" class="border rounded p-2 mb-2">
+                <option v-for="uomOption in uomOptions" :value="uomOption">{{ uomOption }}</option>
+            </select>
+    <br>
+            <a href="javascript:;" onclick="updateProduct()" class="bg-green-400 text-white rounded px-4 py-2 mb-2 inline-block">Save</a>
+            <br />
+            <input type="number" id="product_cnt" value="" placeholder="Please Enter the Print Count" class="border rounded p-2 mb-2">
+            <a href="javascript:;" onclick="Printqr()" class="bg-blue-500 text-white rounded px-4 py-2 inline-block">
+                <i class="material-icons mr-2">print</i>Print Bar Code</a>
+
+        </div>
+    </div>
+    
+
+
+<script>
+var tabledata = new Vue({
+    el: '#app',
+    data: {
+        items: [],  
+        selectedItem: null,
+        uomOptions: ['BOX', 'CTN', 'Gm', 'KG', 'L', 'M', 'Ml', 'NOS', 'PCS', 'PKT', 'ROLL'],
+        search: '', 
+    },
+    mounted() {
+        
+        this.fetchData();
+    },
+    methods: {
+        fetchData() {
+         
+            fetch('http://localhost/muruganqr/api.php')
+                .then(response => response.json())
+                .then(data => {
+                    this.items = data;  
+                    this.filteredItems = data; 
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        handleRadioChange() {
+    // Handle radio button change event
+    console.log('Selected Item:', this.selectedItem);
+
+    this.$nextTick(() => {
+        const selectedItem = this.items.find(item => item.id === this.selectedItem.id);
+        
+        if (selectedItem) {
+            $('#product_id').val(selectedItem.id);
+            $('#product_name').val(selectedItem.name);
+            $('#base_cost').val(selectedItem.base_cost);
+            $('#mrp').val(selectedItem.mrp);
+            $('#tax').val(selectedItem.tax);
+            $('#cost').val(selectedItem.cost);
+            $('#sales_price').val(selectedItem.sales_price);
+            $('#uom').val(selectedItem.uom);
+            $('#product_base_qr').val(selectedItem.product_base_qr);
+        }
+    });
+},
+
+        handleSearch() {
+            // Implement search logic here
+            this.filteredItems = this.items.filter(item =>
+                item.name.toLowerCase().includes(this.search.toLowerCase())
+            );
+        },
+    },
+    computed: {
+        itemsToDisplay() {
+            return this.search ? this.filteredItems : this.items;
+        },
+    },
+});
+
+
+function updateProduct(){
+    var baseCost = parseFloat($('#base_cost').val()) || 0;
+            var tax = parseFloat($('#tax').val()) || 0;
+            var cost = baseCost + (baseCost * (tax / 100));
+            $('#cost').val(cost.toFixed(2));
+
+
+	var postData = {
+            name: $('#product_name').val(),
+            id: $('#product_id').val(),
+            mrp: $('#mrp').val(),
+        base_cost: $('#base_cost').val(),
+        tax: $('#tax').val(),
+        cost: cost,
+        sales_price: $('#sales_price').val(),
+        uom: $('#uom').val(),
+        product_base_qr:$('#product_base_qr').val(),
+           
+        };
+
+        // Make the AJAX POST request
+        $.ajax({
+            type: 'POST',
+            url: 'update.php',
+            data: postData,
+            success: function(response) {
+                console.log('POST request successful', response);
+                // Handle the response here
+                tabledata.fetchData();
+                alert('Product Updated Successfully');
+                window.location.reload();
+            },
+            error: function(error) {
+                console.error('Error making POST request', error);
+                // Handle the error here
+            }
+        });
+}
+function Printqr(){
+    var printCount = $('#product_cnt').val();
+    if (!printCount) {
+        alert("Please enter a print count before printing.");
+        return;
+    }
+	var id = $('#product_id').val();
+    var cnt = printCount;
+	window.open('qr.php?id='+id+'&cnt='+cnt, '_blank');
+}
+function redirectToCreatePage() {
+           
+            window.location.href = "addproduct.html";
+        }
+
+
+        function logout() {
+               
+                sessionStorage.removeItem('authenticated');
+                window.location.href = 'login.html';
+            }
+
+            if (!sessionStorage.getItem('authenticated')) {
+                
+                window.location.href = 'login.html';
+            }
+</script>
+
+</body>
+</html>
